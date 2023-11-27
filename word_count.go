@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"go-wc/counter"
-	"go-wc/counter/bytes"
+	"go-wc/counter/byte"
 	"go-wc/counter/lines"
 	"go-wc/wrapper"
 	"log"
@@ -16,7 +16,7 @@ type commandLineArguments struct {
 }
 
 var CounterMap = map[string]counter.Counter{
-	"c": bytes.Counter{},
+	"c": byte.Counter{},
 	"l": lines.Counter{},
 }
 
@@ -62,7 +62,7 @@ func lookupCounterHandler(arguments commandLineArguments) counter.Counter {
 
 func getCommandLineArguments() commandLineArguments {
 	flags := map[string]*bool{
-		"c": flag.Bool("c", false, "Flag to enable the bytes count"),
+		"c": flag.Bool("c", false, "Flag to enable the byte count"),
 		"l": flag.Bool("l", false, "Flag to enable the lines count"),
 	}
 

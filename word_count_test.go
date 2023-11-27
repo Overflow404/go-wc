@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"go-wc/counter/bytes"
+	"go-wc/counter/byte"
 	"go-wc/counter/lines"
 	"os"
 	"testing"
@@ -53,7 +53,7 @@ func TestLookupCounterHandler_ShouldReturnBytesHandler(t *testing.T) {
 
 	counterHandler := lookupCounterHandler(args)
 
-	_, isBytesCounter := counterHandler.(bytes.Counter)
+	_, isBytesCounter := counterHandler.(byte.Counter)
 	if !isBytesCounter {
 		t.Errorf("Expected BytesCounter, but got %T", counterHandler)
 	}
@@ -85,7 +85,7 @@ func TestLookupCounterHandler_ShouldReturnDefaultHandler(t *testing.T) {
 
 	counterHandler := lookupCounterHandler(args)
 
-	_, isBytesCounter := counterHandler.(bytes.Counter)
+	_, isBytesCounter := counterHandler.(byte.Counter)
 	if !isBytesCounter {
 		t.Errorf("Expected BytesCounter, but got %T", counterHandler)
 	}

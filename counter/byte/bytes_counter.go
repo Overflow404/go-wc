@@ -1,4 +1,4 @@
-package bytes
+package byte
 
 import (
 	"go-wc/wrapper"
