@@ -55,7 +55,7 @@ func TestLookupCounterHandler_ShouldReturnBytesHandler(t *testing.T) {
 
 	_, isBytesCounter := counterHandler.(bytes.Counter)
 	if !isBytesCounter {
-		t.Errorf("Expected Counter, but got %T", counterHandler)
+		t.Errorf("Expected BytesCounter, but got %T", counterHandler)
 	}
 }
 
@@ -71,7 +71,7 @@ func TestLookupCounterHandler_ShouldReturnLinesHandler(t *testing.T) {
 
 	_, isLinesCounter := counterHandler.(lines.Counter)
 	if !isLinesCounter {
-		t.Errorf("Expected Counter, but got %T", counterHandler)
+		t.Errorf("Expected LinesCounter, but got %T", counterHandler)
 	}
 }
 
@@ -87,7 +87,7 @@ func TestLookupCounterHandler_ShouldReturnDefaultHandler(t *testing.T) {
 
 	_, isBytesCounter := counterHandler.(bytes.Counter)
 	if !isBytesCounter {
-		t.Errorf("Expected Counter, but got %T", counterHandler)
+		t.Errorf("Expected BytesCounter, but got %T", counterHandler)
 	}
 }
 
