@@ -1,13 +1,14 @@
-package app
+package main
 
 import (
 	"bufio"
+	"os"
 )
 
 type LineCounter struct{}
 
-func (b LineCounter) Count(filename string, fileWrapper FileWrapper) (int64, error) {
-	file, openError := fileWrapper.Open(filename)
+func (b LineCounter) Count(filename string) (int64, error) {
+	file, openError := os.Open(filename)
 
 	if openError != nil {
 		return 0, openError
