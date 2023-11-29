@@ -19,6 +19,7 @@ Move inside the root directory of the project and run `go run go-wc [flag] [file
 
 * `-c` count bytes
 * `-l` count lines
+* `-w` count words
 * if not specified will run with the `-c` by default
 
 #### filename:
