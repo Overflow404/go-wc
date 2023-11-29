@@ -3,10 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-wc/counter"
-	"go-wc/counter/byte"
-	"go-wc/counter/lines"
-	"go-wc/wrapper"
+	"go-wc/app"
 	"log"
 	"os"
 )
@@ -15,9 +12,9 @@ type commandLineArguments struct {
 	flagEnabled map[string]*bool
 }
 
-var CounterMap = map[string]counter.Counter{
-	"c": byte.Counter{},
-	"l": lines.Counter{},
+var CounterMap = map[string]app.Counter{
+	"c": app.ByteCounter{},
+	"l": app.LineCounter{},
 }
 
 type OsFileWrapper struct{}
@@ -26,7 +23,7 @@ func (m OsFileWrapper) Stat(filename string) (os.FileInfo, error) {
 	return os.Stat(filename)
 }
 
-func (m OsFileWrapper) Open(filename string) (wrapper.File, error) {
+func (m OsFileWrapper) Open(filename string) (app.File, error) {
 	return os.Open(filename)
 }
 
@@ -48,7 +45,7 @@ func main() {
 	fmt.Println(fmt.Sprintf("%d %s", count, filePath))
 }
 
-func lookupCounterHandler(arguments commandLineArguments) counter.Counter {
+func lookupCounterHandler(arguments commandLineArguments) app.Counter {
 	for key, value := range arguments.flagEnabled {
 		if *value {
 			if counterHandler, ok := CounterMap[key]; ok {

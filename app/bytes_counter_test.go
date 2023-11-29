@@ -1,18 +1,18 @@
-package byte
+package app
 
 import (
 	"errors"
-	"go-wc/wrapper"
+	"go-wc/mock"
 	"os"
 	"testing"
 )
 
-var bytesCounter = Counter{}
+var bytesCounter = ByteCounter{}
 
 func TestBytesCounter_Count_ShouldReturnErrorIfStatFails(t *testing.T) {
 	statError := errors.New("stat failed")
 
-	mockedFileWrapper := wrapper.MockedFileWrapper{
+	mockedFileWrapper := mock.FileWrapper{
 		StatFunc: func(_ string) (os.FileInfo, error) {
 			return nil, statError
 		},
@@ -32,10 +32,10 @@ func TestBytesCounter_Count_ShouldReturnErrorIfStatFails(t *testing.T) {
 func TestBytesCounter_Count_ShouldReturnCountIfStatSucceeds(t *testing.T) {
 	expectedBytes := int64(342190)
 
-	testFile, _ := os.Open("resources/test/default.txt")
+	testFile, _ := os.Open("assets/test/default.txt")
 	testStat, _ := testFile.Stat()
 
-	mockedFileWrapper := wrapper.MockedFileWrapper{
+	mockedFileWrapper := mock.FileWrapper{
 		StatFunc: func(_ string) (os.FileInfo, error) {
 			return testStat, nil
 		},
@@ -55,10 +55,10 @@ func TestBytesCounter_Count_ShouldReturnCountIfStatSucceeds(t *testing.T) {
 func TestBytesCounter_Count_ShouldReturnZeroCountIfFileIsEmpty(t *testing.T) {
 	expectedBytes := int64(0)
 
-	testFile, _ := os.Open("resources/test/empty.txt")
+	testFile, _ := os.Open("assets/test/empty.txt")
 	testStat, _ := testFile.Stat()
 
-	mockedFileWrapper := wrapper.MockedFileWrapper{
+	mockedFileWrapper := mock.FileWrapper{
 		StatFunc: func(_ string) (os.FileInfo, error) {
 			return testStat, nil
 		},

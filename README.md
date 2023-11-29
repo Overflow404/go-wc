@@ -14,12 +14,15 @@ Move inside the root directory of the project and run `go test` from the termina
 Move inside the root directory of the project and run `go run go-wc [flag] [filename]` from the terminal
 
 ### Arguments
-#### flags:
+
+#### flag:
+
 * `-c` count bytes
 * `-l` count lines
 * if not specified will run with the `-c` by default
 
 #### filename:
+
 * the name of the file to process, it can be a relative path or an absolute one
 
 ---

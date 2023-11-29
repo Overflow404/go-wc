@@ -2,14 +2,13 @@ package main
 
 import (
 	"flag"
-	"go-wc/counter/byte"
-	"go-wc/counter/lines"
+	"go-wc/app"
 	"os"
 	"testing"
 )
 
 var applicationName = "word_count.go"
-var filePath = "resources/test/default.txt"
+var filePath = "assets/test/default.txt"
 
 func TestGetCommandLineArguments_ShouldSetTheBytesCountPointer(t *testing.T) {
 	oldArgs := os.Args
@@ -53,7 +52,7 @@ func TestLookupCounterHandler_ShouldReturnBytesHandler(t *testing.T) {
 
 	counterHandler := lookupCounterHandler(args)
 
-	_, isBytesCounter := counterHandler.(byte.Counter)
+	_, isBytesCounter := counterHandler.(app.ByteCounter)
 	if !isBytesCounter {
 		t.Errorf("Expected BytesCounter, but got %T", counterHandler)
 	}
@@ -69,7 +68,7 @@ func TestLookupCounterHandler_ShouldReturnLinesHandler(t *testing.T) {
 
 	counterHandler := lookupCounterHandler(args)
 
-	_, isLinesCounter := counterHandler.(lines.Counter)
+	_, isLinesCounter := counterHandler.(app.LineCounter)
 	if !isLinesCounter {
 		t.Errorf("Expected LinesCounter, but got %T", counterHandler)
 	}
@@ -85,7 +84,7 @@ func TestLookupCounterHandler_ShouldReturnDefaultHandler(t *testing.T) {
 
 	counterHandler := lookupCounterHandler(args)
 
-	_, isBytesCounter := counterHandler.(byte.Counter)
+	_, isBytesCounter := counterHandler.(app.ByteCounter)
 	if !isBytesCounter {
 		t.Errorf("Expected BytesCounter, but got %T", counterHandler)
 	}

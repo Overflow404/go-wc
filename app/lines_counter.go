@@ -1,13 +1,12 @@
-package lines
+package app
 
 import (
 	"bufio"
-	"go-wc/wrapper"
 )
 
-type Counter struct{}
+type LineCounter struct{}
 
-func (b Counter) Count(filename string, fileWrapper wrapper.FileWrapper) (int64, error) {
+func (b LineCounter) Count(filename string, fileWrapper FileWrapper) (int64, error) {
 	file, openError := fileWrapper.Open(filename)
 
 	if openError != nil {

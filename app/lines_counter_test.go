@@ -1,20 +1,20 @@
-package lines
+package app
 
 import (
 	"errors"
-	"go-wc/wrapper"
+	"go-wc/mock"
 	"io"
 	"os"
 	"testing"
 )
 
-var linesCounter = Counter{}
+var linesCounter = LineCounter{}
 
 func TestLinesCounter_Count_ShouldReturnErrorIfOpenFails(t *testing.T) {
 	openError := errors.New("open failed")
 
-	mockedFileWrapper := wrapper.MockedFileWrapper{
-		OpenFunc: func(_ string) (wrapper.File, error) {
+	mockedFileWrapper := mock.FileWrapper{
+		OpenFunc: func(_ string) (File, error) {
 			return nil, openError
 		},
 	}
@@ -32,10 +32,10 @@ func TestLinesCounter_Count_ShouldReturnErrorIfOpenFails(t *testing.T) {
 
 func TestLinesCounter_Count_ShouldReturnCountIfOpenSucceeds(t *testing.T) {
 	expectedLines := int64(7145)
-	testFile, _ := os.Open("resources/test/default.txt")
+	testFile, _ := os.Open("assets/test/default.txt")
 
-	mockedFileWrapper := wrapper.MockedFileWrapper{
-		OpenFunc: func(_ string) (wrapper.File, error) {
+	mockedFileWrapper := mock.FileWrapper{
+		OpenFunc: func(_ string) (File, error) {
 			return testFile, nil
 		},
 	}
@@ -54,10 +54,10 @@ func TestLinesCounter_Count_ShouldReturnCountIfOpenSucceeds(t *testing.T) {
 
 func TestLinesCounter_Count_ShouldReturnZeroCountIfFileIsEmpty(t *testing.T) {
 	expectedLines := int64(0)
-	testFile, _ := os.Open("resources/test/empty.txt")
+	testFile, _ := os.Open("assets/test/empty.txt")
 
-	mockedFileWrapper := wrapper.MockedFileWrapper{
-		OpenFunc: func(_ string) (wrapper.File, error) {
+	mockedFileWrapper := mock.FileWrapper{
+		OpenFunc: func(_ string) (File, error) {
 			return testFile, nil
 		},
 	}
@@ -77,9 +77,9 @@ func TestLinesCounter_Count_ShouldReturnZeroCountIfFileIsEmpty(t *testing.T) {
 func TestLinesCounter_Count_ShouldReturnErrorIfOpenSucceedsButCloseFails(t *testing.T) {
 	closeError := errors.New("close error")
 
-	mockedFileWrapper := wrapper.MockedFileWrapper{
-		OpenFunc: func(_ string) (wrapper.File, error) {
-			return wrapper.MockFile{
+	mockedFileWrapper := mock.FileWrapper{
+		OpenFunc: func(_ string) (File, error) {
+			return mock.File{
 				ReadFunc: func(p []byte) (int, error) {
 					return 2, io.EOF
 				},
