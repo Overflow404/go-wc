@@ -6,26 +6,26 @@ import (
 	"testing"
 )
 
-func TestLineCounter_Count_OpenSucceed(t *testing.T) {
+func TestWordCounter_Count_OpenSucceed(t *testing.T) {
 	type args struct {
 		filename string
 	}
 	tests := []struct {
 		name          string
 		args          args
-		expectedLines int64
+		expectedBytes int64
 		expectedError error
 	}{
 		{
-			"it should count the lines if the file exist",
+			"it should count the words if the file exist",
 			args{
 				filename: "assets/test/default.txt",
 			},
-			7145,
+			58164,
 			nil,
 		},
 		{
-			"it should count zero lines if the file is empty",
+			"it should count zero words if the file is empty",
 			args{
 				filename: "assets/test/empty.txt",
 			},
@@ -35,33 +35,33 @@ func TestLineCounter_Count_OpenSucceed(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lineCounter := LineCounter{}
+			wordCounter := WordCounter{}
 
-			actualLines, countError := lineCounter.Count(tt.args.filename)
+			actualWords, countError := wordCounter.Count(tt.args.filename)
 
 			if countError != nil {
 				t.Errorf("Count method returned an error: %v", countError)
 			}
 
-			if actualLines != tt.expectedLines {
-				t.Errorf("Expected %d lines, got %d lines", tt.expectedLines, actualLines)
+			if actualWords != tt.expectedBytes {
+				t.Errorf("Expected %d words, got %d words", tt.expectedBytes, actualWords)
 			}
 		})
 	}
 }
 
-func TestLineCounter_Count_OpenFails(t *testing.T) {
+func TestWordCounter_Count_OpenFails(t *testing.T) {
 	type args struct {
 		filename string
 	}
 	tests := []struct {
 		name          string
 		args          args
-		expectedLines int64
+		expectedWords int64
 		expectedError error
 	}{
 		{
-			"it should count zero lines and return error if the file does not exist",
+			"it should count zero words and return error if the file does not exist",
 			args{
 				filename: "assets/test/_.txt",
 			},
@@ -71,16 +71,16 @@ func TestLineCounter_Count_OpenFails(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lineCounter := LineCounter{}
+			wordCounter := WordCounter{}
 
-			actualLines, actualError := lineCounter.Count(tt.args.filename)
+			actualWords, actualError := wordCounter.Count(tt.args.filename)
 
 			if actualError.Error() != tt.expectedError.Error() {
 				t.Fatalf("Expected error {%s}, got {%s}", tt.expectedError, actualError)
 			}
 
-			if actualLines != tt.expectedLines {
-				t.Errorf("Expected %d lines, got %d lines", tt.expectedLines, actualLines)
+			if actualWords != tt.expectedWords {
+				t.Errorf("Expected %d words, got %d words", tt.expectedWords, actualWords)
 			}
 		})
 	}

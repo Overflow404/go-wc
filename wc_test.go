@@ -32,6 +32,20 @@ func Test_LookupCounterHandler_ShouldReturnTheLineCounterHandler(t *testing.T) {
 	}
 }
 
+func Test_LookupCounterHandler_ShouldReturnTheWordCounterHandler(t *testing.T) {
+	args := map[string]*bool{
+		"w": new(bool),
+	}
+
+	*args["w"] = true
+
+	result := lookupCounterHandler(args)
+
+	if _, ok := result.(WordCounter); !ok {
+		t.Errorf("Expected WordCounter, but got %T", result)
+	}
+}
+
 func Test_LookupCounterHandler_ShouldReturnTheByteCounterByDefault(t *testing.T) {
 	args := map[string]*bool{}
 

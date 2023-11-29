@@ -10,6 +10,7 @@ import (
 var CounterMap = map[string]Counter{
 	"c": ByteCounter{},
 	"l": LineCounter{},
+	"w": WordCounter{},
 }
 
 func main() {
@@ -46,6 +47,7 @@ func getCommandLineArguments() map[string]*bool {
 	flags := map[string]*bool{
 		"c": flag.Bool("c", false, "Flag to enable the byte count"),
 		"l": flag.Bool("l", false, "Flag to enable the lines count"),
+		"w": flag.Bool("w", false, "Flag to enable the words count"),
 	}
 
 	flag.Parse()
