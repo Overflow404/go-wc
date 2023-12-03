@@ -1,86 +1,35 @@
 package main
 
-import (
-	"errors"
-	"fmt"
-	"testing"
-)
+import "testing"
 
-func TestCharCounter_Count_OpenSucceed(t *testing.T) {
-	type args struct {
-		filename string
-	}
+func TestCharCounter_Count(t *testing.T) {
 	tests := []struct {
-		name          string
-		args          args
-		expectedChars int64
-		expectedError error
+		name   string
+		input  string
+		output int
 	}{
 		{
-			"it should count the chars if the file exist",
-			args{
-				filename: "assets/test/default.txt",
-			},
-			325002,
-			nil,
+			name:   "Empty String",
+			input:  "",
+			output: 0,
 		},
 		{
-			"it should count zero chars if the file is empty",
-			args{
-				filename: "assets/test/empty.txt",
-			},
-			0,
-			nil,
+			name:   "String with Random Content",
+			input:  "Hello, 世界!",
+			output: 10,
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			charCounter := CharCounter{}
-
-			actualChars, countError := charCounter.Count(tt.args.filename)
-
-			if countError != nil {
-				t.Errorf("Count method returned an error: %v", countError)
-			}
-
-			if actualChars != tt.expectedChars {
-				t.Errorf("Expected %d chars, got %d chars", tt.expectedChars, actualChars)
-			}
-		})
-	}
-}
-
-func TestCharCounter_Count_OpenFails(t *testing.T) {
-	type args struct {
-		filename string
-	}
-	tests := []struct {
-		name          string
-		args          args
-		expectedChars int64
-		expectedError error
-	}{
 		{
-			"it should count zero chars and return error if the file does not exist",
-			args{
-				filename: "assets/test/_.txt",
-			},
-			0,
-			errors.New(fmt.Sprintf("open %s: no such file or directory", "assets/test/_.txt")),
+			name:   "String with Numbers",
+			input:  "1234567890",
+			output: 10,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			charCounter := CharCounter{}
 
-			actualChars, actualError := charCounter.Count(tt.args.filename)
-
-			if actualError.Error() != tt.expectedError.Error() {
-				t.Fatalf("Expected error {%s}, got {%s}", tt.expectedError, actualError)
-			}
-
-			if actualChars != tt.expectedChars {
-				t.Errorf("Expected %d chars, got %d chars", tt.expectedChars, actualChars)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := CharCounter{}.Count(test.input)
+			if result != test.output {
+				t.Errorf("Expected %d characters, but got %d for input: %s", test.output, result, test.input)
 			}
 		})
 	}

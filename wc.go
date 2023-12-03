@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -20,17 +21,57 @@ var counters = map[string]Counter{
 }
 
 func main() {
-	if len(os.Args) <= 1 {
-		log.Fatalf("usage: go-wc <flag> <filename>")
+	var input string
+	var fileName string
+
+	if inputIsComingFromPipe() {
+		input = readPipeInput(input)
+	} else {
+		if moreArgumentsAreProvided() {
+			fileName = os.Args[len(os.Args)-1]
+			input = readFileInput(fileName)
+		} else {
+			log.Fatalf("usage: go-wc <flag> <filename>")
+		}
 	}
 
 	commandLineArguments := getCommandLineArguments()
 
-	if noCommandLineArgumentsAreProvided(commandLineArguments) {
-		handleDefaultCommand(os.Args[1:][0], counters)
+	if noCommandLineArguments(commandLineArguments) {
+		processDefaultCommand(fileName, input, counters)
 	} else {
-		handleCustomCommand(os.Args[1:][1], commandLineArguments, counters)
+		processCustomCommand(fileName, input, commandLineArguments, counters)
 	}
+}
+
+func inputIsComingFromPipe() bool {
+	stat, _ := os.Stdin.Stat()
+	return (stat.Mode() & os.ModeCharDevice) == 0
+}
+
+func readPipeInput(input string) string {
+	pipeInput, readAllError := io.ReadAll(os.Stdin)
+
+	if readAllError != nil {
+		log.Fatalf("Error reading through pipe: %v", readAllError)
+	}
+
+	input = string(pipeInput)
+	return input
+}
+
+func moreArgumentsAreProvided() bool {
+	return len(os.Args) > 1
+}
+
+func readFileInput(fileName string) string {
+	fileInput, readFileError := os.ReadFile(fileName)
+
+	if readFileError != nil {
+		log.Fatalf("Error reading from file: %v", readFileError)
+	}
+
+	return string(fileInput)
 }
 
 func getCommandLineArguments() map[string]*bool {
@@ -46,9 +87,9 @@ func getCommandLineArguments() map[string]*bool {
 	return flags
 }
 
-func noCommandLineArgumentsAreProvided(flags map[string]*bool) bool {
-	for _, value := range flags {
-		if *value {
+func noCommandLineArguments(commandLineArguments map[string]*bool) bool {
+	for _, value := range commandLineArguments {
+		if *value == true {
 			return false
 		}
 	}
@@ -56,54 +97,26 @@ func noCommandLineArgumentsAreProvided(flags map[string]*bool) bool {
 	return true
 }
 
-func handleDefaultCommand(fileName string, counters map[string]Counter) {
-	result, defaultCommandError := defaultCommand(fileName, counters)
-
-	if defaultCommandError != nil {
-		log.Fatalf("%v", defaultCommandError)
-	}
-
-	fmt.Println(result)
+func processDefaultCommand(fileName string, input string, counters map[string]Counter) {
+	result := defaultCommand(fileName, input, counters)
+	fmt.Println(fmt.Sprintf("\t%s", result))
 }
 
-func handleCustomCommand(fileName string, commandLineArguments map[string]*bool, counters map[string]Counter) {
+func defaultCommand(filePath string, input string, counters map[string]Counter) string {
+	bytes := counters[bytesFlag].Count(input)
+
+	lines := counters[linesFlag].Count(input)
+
+	words := counters[wordsFlag].Count(input)
+
+	return fmt.Sprintf("%d %d %d %s", lines, words, bytes, filePath)
+}
+
+func processCustomCommand(fileName string, input string, commandLineArguments map[string]*bool, counters map[string]Counter) {
 	counterHandler := lookupCounterHandler(commandLineArguments, counters)
-	result, customCommandError := customCommand(fileName, counterHandler)
+	result := customCommand(input, counterHandler)
 
-	if customCommandError != nil {
-		log.Fatalf("%v", customCommandError)
-	}
-
-	fmt.Println(fmt.Sprintf("%d %s", result, fileName))
-}
-
-func defaultCommand(filePath string, counters map[string]Counter) (string, error) {
-	bytes, bytesError := counters[bytesFlag].Count(filePath)
-	if bytesError != nil {
-		return "", bytesError
-	}
-
-	lines, linesError := counters[linesFlag].Count(filePath)
-	if linesError != nil {
-		return "", linesError
-	}
-
-	words, wordsError := counters[wordsFlag].Count(filePath)
-	if wordsError != nil {
-		return "", wordsError
-	}
-
-	return fmt.Sprintf("%d %d %d %s", lines, words, bytes, filePath), nil
-}
-
-func customCommand(filePath string, counter Counter) (int64, error) {
-	count, counterError := counter.Count(filePath)
-
-	if counterError != nil {
-		return 0, counterError
-	}
-
-	return count, nil
+	fmt.Println(fmt.Sprintf("\t%d %s", result, fileName))
 }
 
 func lookupCounterHandler(flags map[string]*bool, counters map[string]Counter) Counter {
@@ -116,4 +129,8 @@ func lookupCounterHandler(flags map[string]*bool, counters map[string]Counter) C
 	}
 
 	return counters[bytesFlag]
+}
+
+func customCommand(input string, counter Counter) int {
+	return counter.Count(input)
 }

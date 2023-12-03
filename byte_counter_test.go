@@ -1,86 +1,37 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"testing"
 )
 
-func TestByteCounter_Count_StatSucceed(t *testing.T) {
-	type args struct {
-		filename string
-	}
+func TestByteCounter_Count(t *testing.T) {
 	tests := []struct {
-		name          string
-		args          args
-		expectedBytes int64
-		expectedError error
+		name   string
+		input  string
+		output int
 	}{
 		{
-			"it should count the bytes if the file exist",
-			args{
-				filename: "assets/test/default.txt",
-			},
-			342190,
-			nil,
+			name:   "Empty String",
+			input:  "",
+			output: 0,
 		},
 		{
-			"it should count zero bytes if the file is empty",
-			args{
-				filename: "assets/test/empty.txt",
-			},
-			0,
-			nil,
+			name:   "String with Random Content",
+			input:  "Hello, world!",
+			output: 13,
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			byteCounter := ByteCounter{}
-
-			actualBytes, countError := byteCounter.Count(tt.args.filename)
-
-			if countError != nil {
-				t.Errorf("Count method returned an error: %v", countError)
-			}
-
-			if actualBytes != tt.expectedBytes {
-				t.Errorf("Expected %d bytes, got %d bytes", tt.expectedBytes, actualBytes)
-			}
-		})
-	}
-}
-
-func TestByteCounter_Count_StatFails(t *testing.T) {
-	type args struct {
-		filename string
-	}
-	tests := []struct {
-		name          string
-		args          args
-		expectedBytes int64
-		expectedError error
-	}{
 		{
-			"it should count zero bytes and return error if the file does not exist",
-			args{
-				filename: "assets/test/_.txt",
-			},
-			0,
-			errors.New(fmt.Sprintf("stat %s: no such file or directory", "assets/test/_.txt")),
+			name:   "String with Numbers",
+			input:  "1234567890",
+			output: 10,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			byteCounter := ByteCounter{}
 
-			actualBytes, actualError := byteCounter.Count(tt.args.filename)
-
-			if actualError.Error() != tt.expectedError.Error() {
-				t.Fatalf("Expected error {%s}, got {%s}", tt.expectedError, actualError)
-			}
-
-			if actualBytes != tt.expectedBytes {
-				t.Errorf("Expected %d bytes, got %d bytes", tt.expectedBytes, actualBytes)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := ByteCounter{}.Count(test.input)
+			if result != test.output {
+				t.Errorf("Expected %d bytes, but got %d for input: %s", test.output, result, test.input)
 			}
 		})
 	}
