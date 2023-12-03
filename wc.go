@@ -7,6 +7,18 @@ import (
 	"os"
 )
 
+const bytesFlag = "c"
+const linesFlag = "l"
+const wordsFlag = "w"
+const charactersFlag = "m"
+
+var counters = map[string]Counter{
+	bytesFlag:      ByteCounter{},
+	linesFlag:      LineCounter{},
+	wordsFlag:      WordCounter{},
+	charactersFlag: CharCounter{},
+}
+
 func main() {
 	if len(os.Args) <= 1 {
 		log.Fatalf("usage: go-wc <flag> <filename>")
@@ -14,40 +26,19 @@ func main() {
 
 	commandLineArguments := getCommandLineArguments()
 
-	counters := map[string]Counter{
-		"c": ByteCounter{},
-		"l": LineCounter{},
-		"w": WordCounter{},
-		"m": CharCounter{},
-	}
-
 	if noCommandLineArgumentsAreProvided(commandLineArguments) {
-		result, defaultCommandError := defaultCommand(os.Args[1:][0], counters)
-
-		if defaultCommandError != nil {
-			log.Fatalf("%v", defaultCommandError)
-		}
-
-		fmt.Println(result)
+		handleDefaultCommand(os.Args[1:][0], counters)
 	} else {
-		fileName := os.Args[1:][1]
-		counterHandler := lookupCounterHandler(commandLineArguments, counters)
-		result, customCommandError := customCommand(fileName, counterHandler)
-
-		if customCommandError != nil {
-			log.Fatalf("%v", customCommandError)
-		}
-
-		fmt.Println(fmt.Sprintf("%d %s", result, fileName))
+		handleCustomCommand(os.Args[1:][1], commandLineArguments, counters)
 	}
 }
 
 func getCommandLineArguments() map[string]*bool {
 	flags := map[string]*bool{
-		"c": flag.Bool("c", false, "Flag to enable the byte count"),
-		"l": flag.Bool("l", false, "Flag to enable the lines count"),
-		"w": flag.Bool("w", false, "Flag to enable the words count"),
-		"m": flag.Bool("m", false, "Flag to enable the characters count"),
+		bytesFlag:      flag.Bool(bytesFlag, false, "Flag to enable the byte count"),
+		linesFlag:      flag.Bool(linesFlag, false, "Flag to enable the lines count"),
+		wordsFlag:      flag.Bool(wordsFlag, false, "Flag to enable the words count"),
+		charactersFlag: flag.Bool(charactersFlag, false, "Flag to enable the characters count"),
 	}
 
 	flag.Parse()
@@ -65,18 +56,39 @@ func noCommandLineArgumentsAreProvided(flags map[string]*bool) bool {
 	return true
 }
 
+func handleDefaultCommand(fileName string, counters map[string]Counter) {
+	result, defaultCommandError := defaultCommand(fileName, counters)
+
+	if defaultCommandError != nil {
+		log.Fatalf("%v", defaultCommandError)
+	}
+
+	fmt.Println(result)
+}
+
+func handleCustomCommand(fileName string, commandLineArguments map[string]*bool, counters map[string]Counter) {
+	counterHandler := lookupCounterHandler(commandLineArguments, counters)
+	result, customCommandError := customCommand(fileName, counterHandler)
+
+	if customCommandError != nil {
+		log.Fatalf("%v", customCommandError)
+	}
+
+	fmt.Println(fmt.Sprintf("%d %s", result, fileName))
+}
+
 func defaultCommand(filePath string, counters map[string]Counter) (string, error) {
-	bytes, bytesError := counters["c"].Count(filePath)
+	bytes, bytesError := counters[bytesFlag].Count(filePath)
 	if bytesError != nil {
 		return "", bytesError
 	}
 
-	lines, linesError := counters["l"].Count(filePath)
+	lines, linesError := counters[linesFlag].Count(filePath)
 	if linesError != nil {
 		return "", linesError
 	}
 
-	words, wordsError := counters["w"].Count(filePath)
+	words, wordsError := counters[wordsFlag].Count(filePath)
 	if wordsError != nil {
 		return "", wordsError
 	}
@@ -103,5 +115,5 @@ func lookupCounterHandler(flags map[string]*bool, counters map[string]Counter) C
 		}
 	}
 
-	return counters["c"]
+	return counters[bytesFlag]
 }
