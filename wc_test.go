@@ -51,47 +51,47 @@ func Test_GetCommandLineArguments_ShouldReturnAMapOnlyWithTheBytesFlagSet(t *tes
 
 }
 
-//func Test_NoCommandLineArgumentsAreProvided_ShouldReturnTrueWhenNoArguments(t *testing.T) {
-//	bytesFlag := false
-//	linesFlag := false
-//	wordsFlag := false
-//	charactersFlag := false
-//
-//	arguments := map[string]*bool{
-//		"c": &bytesFlag,
-//		"l": &linesFlag,
-//		"w": &wordsFlag,
-//		"m": &charactersFlag,
-//	}
-//
-//	result := noCommandLineArgumentsAreProvided(arguments)
-//
-//	if result != true {
-//		t.Errorf("Expected %v got %v", bytesFlag, result)
-//	}
-//
-//}
-//
-//func Test_NoCommandLineArgumentsAreProvided_ShouldReturnFalseWhenAtLeastOneArgument(t *testing.T) {
-//	bytesFlag := false
-//	linesFlag := true
-//	wordsFlag := false
-//	charactersFlag := false
-//
-//	arguments := map[string]*bool{
-//		"c": &bytesFlag,
-//		"l": &linesFlag,
-//		"w": &wordsFlag,
-//		"m": &charactersFlag,
-//	}
-//
-//	result := noCommandLineArgumentsAreProvided(arguments)
-//
-//	if result != false {
-//		t.Errorf("Expected %v got %v", linesFlag, result)
-//	}
-//
-//}
+func Test_NoCommandLineArguments_ShouldReturnTrueWhenNoArguments(t *testing.T) {
+	bytesFlag := false
+	linesFlag := false
+	wordsFlag := false
+	charactersFlag := false
+
+	arguments := map[string]*bool{
+		"c": &bytesFlag,
+		"l": &linesFlag,
+		"w": &wordsFlag,
+		"m": &charactersFlag,
+	}
+
+	result := noCommandLineArguments(arguments)
+
+	if result != true {
+		t.Errorf("Expected %v got %v", bytesFlag, result)
+	}
+
+}
+
+func Test_NoCommandLineArguments_ShouldReturnFalseWhenAtLeastOneArgument(t *testing.T) {
+	bytesFlag := false
+	linesFlag := true
+	wordsFlag := false
+	charactersFlag := false
+
+	arguments := map[string]*bool{
+		"c": &bytesFlag,
+		"l": &linesFlag,
+		"w": &wordsFlag,
+		"m": &charactersFlag,
+	}
+
+	result := noCommandLineArguments(arguments)
+
+	if result != false {
+		t.Errorf("Expected %v got %v", linesFlag, result)
+	}
+
+}
 
 func TestDefaultCommand_ShouldReturnBytesLinesWordsCount(t *testing.T) {
 	counters := map[string]Counter{
