@@ -7,13 +7,6 @@ import (
 	"os"
 )
 
-var CounterMap = map[string]Counter{
-	"c": ByteCounter{},
-	"l": LineCounter{},
-	"w": WordCounter{},
-	"m": CharCounter{},
-}
-
 func main() {
 	if len(os.Args) <= 1 {
 		log.Fatalf("usage: go-wc <flag> <filename>")
@@ -21,25 +14,32 @@ func main() {
 
 	commandLineArguments := getCommandLineArguments()
 
+	counters := map[string]Counter{
+		"c": ByteCounter{},
+		"l": LineCounter{},
+		"w": WordCounter{},
+		"m": CharCounter{},
+	}
+
 	if noCommandLineArgumentsAreProvided(commandLineArguments) {
-		filePath := os.Args[1:][0]
-		defaultBehaviour(filePath)
-	} else {
-		filePath := os.Args[1:][1]
-		customBehaviour(filePath, commandLineArguments)
-	}
-}
+		result, defaultCommandError := defaultCommand(os.Args[1:][0], counters)
 
-func lookupCounterHandler(flags map[string]*bool) Counter {
-	for key, value := range flags {
-		if *value {
-			if counterHandler, ok := CounterMap[key]; ok {
-				return counterHandler
-			}
+		if defaultCommandError != nil {
+			log.Fatalf("%v", defaultCommandError)
 		}
-	}
 
-	return CounterMap["c"]
+		fmt.Println(result)
+	} else {
+		fileName := os.Args[1:][1]
+		counterHandler := lookupCounterHandler(commandLineArguments, counters)
+		result, customCommandError := customCommand(fileName, counterHandler)
+
+		if customCommandError != nil {
+			log.Fatalf("%v", customCommandError)
+		}
+
+		fmt.Println(fmt.Sprintf("%d %s", result, fileName))
+	}
 }
 
 func getCommandLineArguments() map[string]*bool {
@@ -56,44 +56,52 @@ func getCommandLineArguments() map[string]*bool {
 }
 
 func noCommandLineArgumentsAreProvided(flags map[string]*bool) bool {
-	for key, value := range flags {
+	for _, value := range flags {
 		if *value {
-			if _, ok := CounterMap[key]; ok {
-				return false
-			}
+			return false
 		}
 	}
 
 	return true
 }
 
-func customBehaviour(filePath string, commandLineArguments map[string]*bool) {
-	counterHandler := lookupCounterHandler(commandLineArguments)
-
-	count, counterError := counterHandler.Count(filePath)
-
-	if counterError != nil {
-		log.Fatalf("%v", counterError)
+func defaultCommand(filePath string, counters map[string]Counter) (string, error) {
+	bytes, bytesError := counters["c"].Count(filePath)
+	if bytesError != nil {
+		return "", bytesError
 	}
 
-	fmt.Println(fmt.Sprintf("%d %s", count, filePath))
+	lines, linesError := counters["l"].Count(filePath)
+	if linesError != nil {
+		return "", linesError
+	}
+
+	words, wordsError := counters["w"].Count(filePath)
+	if wordsError != nil {
+		return "", wordsError
+	}
+
+	return fmt.Sprintf("%d %d %d %s", lines, words, bytes, filePath), nil
 }
 
-func defaultBehaviour(filePath string) {
-	bytes, bytesError := ByteCounter{}.Count(filePath)
-	if bytesError != nil {
-		log.Fatalf("%v", bytesError)
+func customCommand(filePath string, counter Counter) (int64, error) {
+	count, counterError := counter.Count(filePath)
+
+	if counterError != nil {
+		return 0, counterError
 	}
 
-	lines, linesError := LineCounter{}.Count(filePath)
-	if linesError != nil {
-		log.Fatalf("%v", linesError)
+	return count, nil
+}
+
+func lookupCounterHandler(flags map[string]*bool, counters map[string]Counter) Counter {
+	for key, value := range flags {
+		if *value {
+			if counterHandler, ok := counters[key]; ok {
+				return counterHandler
+			}
+		}
 	}
 
-	words, wordsError := WordCounter{}.Count(filePath)
-	if wordsError != nil {
-		log.Fatalf("%v", wordsError)
-	}
-
-	fmt.Println(fmt.Sprintf("%d %d %d %s", lines, words, bytes, filePath))
+	return counters["c"]
 }
