@@ -28,8 +28,7 @@ func main() {
 		input = readPipeInput(input)
 	} else {
 		if moreArgumentsAreProvided() {
-			fileName = os.Args[len(os.Args)-1]
-			input = readFileInput(fileName)
+			input = readFileInput(readFileName())
 		} else {
 			log.Fatalf("usage: go-wc <flag> <filename>")
 		}
@@ -42,6 +41,10 @@ func main() {
 	} else {
 		processCustomCommand(fileName, input, commandLineArguments, counters)
 	}
+}
+
+func readFileName() string {
+	return os.Args[len(os.Args)-1]
 }
 
 func inputIsComingFromPipe() bool {
